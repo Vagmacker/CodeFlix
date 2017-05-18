@@ -13,6 +13,9 @@ use CodeFlix\Models\User;
  */
 class UserRepositoryEloquent extends BaseRepository implements UserRepository
 {
+    protected $fieldSearchable = [
+        'name' => 'like'
+    ];
 
     public function create(array $attributes)
     {

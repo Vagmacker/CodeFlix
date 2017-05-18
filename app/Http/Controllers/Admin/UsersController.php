@@ -26,10 +26,11 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
         $users = $this->userRepository->paginate(8);
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users', 'search'));
     }
 
     /**
@@ -75,7 +76,7 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return view('admin.users.show', compact('user'));
     }
 
     /**
@@ -111,8 +112,7 @@ class UsersController extends Controller
         }
 
         $data = array_except($form->getFieldValues(),['password', 'role']);
-        $user->fill($data);
-        $user->save();
+        $this->userRepository->update($data, $user->id);
         $request->session()->flash('message', 'Usuário alterado com sucesso');
         return redirect()->route('admin.users.index');
     }
@@ -125,6 +125,8 @@ class UsersController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $this->userRepository->delete($user->id);
+        \Session::flash('message', 'Usuário excluído com sucesso');
+        return redirect()->route('admin.users.index');
     }
 }
