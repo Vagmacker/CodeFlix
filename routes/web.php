@@ -29,5 +29,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin\\'], 
     Route::group(['middleware' => 'can:admin'], function(){
         Route::post('logout', 'Auth\LoginController@logout')->name('logout');
         Route::resource('users', 'UsersController');
+        Route::resource('categories', 'CategoriesController');
     });
 });

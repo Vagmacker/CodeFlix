@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UsersTable extends Migration
+class CreateCategoriesTable extends Migration
 {
 
 	/**
@@ -13,9 +13,9 @@ class UsersTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('models\_users', function(Blueprint $table) {
+		Schema::create('categories', function(Blueprint $table) {
             $table->increments('id');
-
+            $table->string('name');
             $table->timestamps();
 		});
 	}
@@ -27,7 +27,7 @@ class UsersTable extends Migration
 	 */
 	public function down()
 	{
-		Schema::drop('models\_users');
+		Schema::drop('categories');
 	}
 
 }

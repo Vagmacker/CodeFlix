@@ -29,4 +29,10 @@ $factory->state(CodeFlix\Models\User::class, 'admin', function (Faker\Generator 
     ];
 });
 
+$factory->define(CodeFlix\Models\Category::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->word
+    ];
+});
+
 
