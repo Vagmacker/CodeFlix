@@ -75,7 +75,7 @@ class CategoriesController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        return view('admin.categories.show', compact('category'));
     }
 
     /**
@@ -86,7 +86,13 @@ class CategoriesController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        $form = \FormBuilder::create(CategoryForm::class, [
+            'url' => route('admin.categories.update', ['category' => $category->id]),
+            'method' => 'PUT',
+            'model' => $category
+        ]);
+
+        return view('admin.categories.edit', compact('form'));
     }
 
     /**
@@ -96,9 +102,21 @@ class CategoriesController extends Controller
      * @param  \CodeFlix\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
-        //
+        /**
+         * @var \Form $form
+         */
+        $form = \FormBuilder::create(CategoryForm::class);
+
+        if (!$form->isValid()) {
+            return redirect()->back()->withErrors($form->getErrors())->withInput();
+        }
+
+        $data = $form->getFieldValues();
+        $this->categoryRepository->update($data, $id);
+        $request->session()->flash('message', 'Categoria alterada com sucesso');
+        return redirect()->route('admin.categories.index');
     }
 
     /**
@@ -107,8 +125,10 @@ class CategoriesController extends Controller
      * @param  \CodeFlix\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        //
+        $this->categoryRepository->delete($id);
+        \Session::flash('message', 'Categoria excluída com sucesso');
+        return redirect()->route('admin.categories.index');
     }
 }
