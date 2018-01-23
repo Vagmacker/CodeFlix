@@ -7,7 +7,6 @@ use CodeFlix\Http\Controllers\Controller;
 use CodeFlix\Models\Serie;
 use CodeFlix\Repositories\SerieRepository;
 use Illuminate\Database\Eloquent\Model;
-use Kris\LaravelFormBuilder\Facades\FormBuilder;
 
 class SeriesController extends Controller
 {
@@ -43,7 +42,7 @@ class SeriesController extends Controller
      */
     public function create()
     {
-        $form = FormBuilder::create(SerieForm::class, [
+        $form = \FormBuilder::create(SerieForm::class, [
             'url' => route('admin.series.store'),
             'method' => 'POST'
         ]);
@@ -58,7 +57,7 @@ class SeriesController extends Controller
      */
     public function store()
     {
-        $form = FormBuilder::create(SerieForm::class);
+        $form = \FormBuilder::create(SerieForm::class);
 
         if (!$form->isValid()) {
             return redirect()->back()->withErrors($form->getErrors())->withInput();
@@ -93,7 +92,7 @@ class SeriesController extends Controller
      */
     public function edit(Serie $series)
     {
-        $form = FormBuilder::create(SerieForm::class, [
+        $form = \FormBuilder::create(SerieForm::class, [
             'url' => route( 'admin.series.update', ['serie' => $series->id]),
             'method' => 'PUT',
             'model' => $series,
@@ -112,7 +111,7 @@ class SeriesController extends Controller
      */
     public function update($id)
     {
-        $form = FormBuilder::create(SerieForm::class,[
+        $form = \FormBuilder::create(SerieForm::class,[
             'data' => ['id' => $id]
         ]);
 
@@ -142,20 +141,20 @@ class SeriesController extends Controller
     }
 
     /**
-     * @param Serie $serie
+     * @param Serie $series
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function thumbAsset(Serie $serie)
+    public function thumbAsset(Serie $series)
     {
-        return response()->download($serie->thumb_path);
+        return response()->download($series->thumb_path);
     }
 
     /**
-     * @param Serie $serie
+     * @param Serie $series
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function thumbSmallAsset(Serie $serie)
+    public function thumbSmallAsset(Serie $series)
     {
-        return response()->download($serie->thumb_small_path);
+        return response()->download($series->thumb_small_path);
     }
 }
