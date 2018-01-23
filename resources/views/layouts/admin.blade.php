@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ config('app.locale') }}">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,79 +12,70 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-    <!-- Scripts -->
-    <script>
-        window.Laravel = {!! json_encode([
-            'csrfToken' => csrf_token(),
-        ]) !!};
-    </script>
+    @stack('styles')
 </head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top navbar-inverse">
-            <div class="container">
-                <div class="navbar-header">
+<div id="app">
+    <?php
+        $navbar =  \Bootstrapper\Facades\Navbar::withBrand(config('app.name'), url('/admin/dashboard'))->inverse();
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+        if(Auth::check()){
+            $arrayLinks = [
+                ['link' => route('admin.users.index'),'title' => 'Usuários'],
+                ['link' => route('admin.categories.index'), 'title' => 'Categorias'],
+                ['link' => route('admin.series.index'), 'title' => 'Series'],
+                #['link' => route('admin.videos.index'), 'title' => 'Videos'],
+            ];
 
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
-                    </a>
-                </div>
+            $menus = \Bootstrapper\Facades\Navigation::links($arrayLinks);
+            $logout = \Bootstrapper\Facades\Navigation::links([
+                [
+                    Auth::user()->name,
+                    [
+                        [
+                            'link' => route('admin.logout'),
+                            'title' => 'Logout',
+                            'linkAttributes' => [
+                                'onclick' => "event.preventDefault();document.getElementById(\"form-logout\").submit();"
+                            ]
+                        ],
+                        [
+                            'link' => route('admin.user-settings.edit'),
+                            'title' => 'Configurações'
+                        ],
+                    ]
+                ]
+            ])->right();
 
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
+            $navbar->withContent($menus)->withContent($logout);
+        }
+    ?>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        @if (Auth::guest())
-                            <li><a href="{{ route('admin.login') }}">Login</a></li>
-                        @else
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
+    {!! $navbar !!}
 
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ route('admin.logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
+    <?php
+        $formLogout = FormBuilder::plain([
+            'id' => 'form-logout',
+            'route' => [
+                'admin.logout',
+            ],
+            'method' => 'POST',
+            'style' => 'display:none'
+        ])
+    ?>
 
-                                        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        @if(Session::has('message'))
-            <div class="container">
-                {!! Alert::success(Session::get('message'))->close() !!}
-            </div>
-        @endif
-        @yield('content')
-    </div>
+    {!! form($formLogout) !!}
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    @if(Session::has('message'))
+        <div class="container">
+            {!! Alert::success(Session::get('message'))->close() !!}
+        </div>
+    @endif
+
+    @yield('content')
+</div>
+
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>

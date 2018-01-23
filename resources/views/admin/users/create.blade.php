@@ -10,7 +10,6 @@
                     'label' => Icon::create('floppy-disk')
                 ]))
             !!}
-            {!! Button::success(Icon::create('circle-arrow-left'))->block() !!}
         </div>
     </div>
 @endsection

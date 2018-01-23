@@ -7,7 +7,6 @@ use CodeFlix\Models\User;
 use CodeFlix\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use CodeFlix\Http\Controllers\Controller;
-use Kris\LaravelFormBuilder\Facades\FormBuilder;
 
 class UsersController extends Controller
 {

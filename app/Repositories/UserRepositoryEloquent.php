@@ -4,7 +4,6 @@ namespace CodeFlix\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use CodeFlix\Repositories\UserRepository;
 use CodeFlix\Models\User;
 
 /**
@@ -17,11 +16,37 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
         'name' => 'like'
     ];
 
+    /**
+     * @param array $attributes
+     * @return mixed
+     * @throws \Jrean\UserVerification\Exceptions\ModelNotCompliantException
+     * @throws \Prettus\Validator\Exceptions\ValidatorException
+     */
     public function create(array $attributes)
     {
         $attributes['role'] = User::ROLE_ADMIN;
         $attributes['password'] = User::generatePassword();
-        return parent::create($attributes);
+        $model = parent::create($attributes);
+        \UserVerification::generate($model);
+        \UserVerification::send($model, 'Sua conta foi criada');
+        return $model;
+    }
+
+    /**
+     * @param array $attributes
+     * @param $id
+     * @return mixed
+     * @throws \Prettus\Validator\Exceptions\ValidatorException
+     */
+    public function update(array $attributes, $id)
+    {
+        if(isset($attributes['password'])){
+            $attributes['password'] = User::generatePassword($attributes['password']);
+        }
+
+        $model = parent::update($attributes, $id);
+
+        return $model;
     }
 
     /**
@@ -36,6 +61,7 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
 
     /**
      * Boot up the repository, pushing criteria
+     * @throws \Prettus\Repository\Exceptions\RepositoryException
      */
     public function boot()
     {

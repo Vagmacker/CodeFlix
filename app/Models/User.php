@@ -16,13 +16,14 @@ class User extends Authenticatable implements Transformable, TableInterface
 
     const ROLE_ADMIN = 1;
     const ROLE_CLIENT = 2;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role'
+        'name', 'email', 'password', 'role', 'verified'
     ];
 
     /**
@@ -31,9 +32,13 @@ class User extends Authenticatable implements Transformable, TableInterface
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'verified',
     ];
 
+    /**
+     * @param null $password
+     * @return string
+     */
     public static function generatePassword($password = null)
     {
         return !$password ? bcrypt(str_random(8)) : bcrypt($password);
@@ -80,5 +85,4 @@ class User extends Authenticatable implements Transformable, TableInterface
                 return $this->email;
         }
     }
-
 }

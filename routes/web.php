@@ -20,15 +20,32 @@ Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail'
 Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
+Route::get('email-verification/error', 'EmailVerificationController@getVerificationError')
+    ->name('email-verification.error');
+Route::get('email-verification/check/{token}', 'EmailVerificationController@getVerification')
+    ->name('email-verification.check');
+
 Route::get('/home', 'HomeController@index');
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin\\'], function(){
     Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
     Route::post('login', 'Auth\LoginController@login');
 
-    Route::group(['middleware' => 'can:admin'], function(){
-        Route::post('logout', 'Auth\LoginController@logout')->name('logout');
+    Route::group(['middleware' => ['isVerified','can:admin']], function(){
+
+        Route::post('logout', 'Auth\LoginController@logout')
+            ->name('logout');
+        Route::get('users/settings','Auth\UserSettingsController@edit')
+            ->name('user-settings.edit');
+        Route::put('users/settings','Auth\UserSettingsController@update')
+            ->name('user-settings.update');
+
         Route::resource('users', 'UsersController');
         Route::resource('categories', 'CategoriesController');
+        Route::resource('series', 'SeriesController');
+
+        Route::get('dashboard', function(){
+            return view('admin.dashboard');
+        });
     });
 });
